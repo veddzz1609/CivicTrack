@@ -332,7 +332,7 @@ app.use((error, req, res, next) => {
 // 8. START SERVER
 // ========================================
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
     console.log(`CivicTrack server running on port ${PORT}`);
