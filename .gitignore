@@ -1,21 +1,8 @@
-# Dependencies
 node_modules/
-
-# Environment variables and secrets
 .env
 .env.*
 !.env.example
-
-# Build files
 dist/
-build/
-
-# Logs
-*.log
-
-# Operating system
-.DS_Store
-Thumbs.db
-
-# Hosting
-.vercel/
+client/dist/
+server/node_modules/
+uploads/
