@@ -82,7 +82,7 @@ function ReportForm({ onReportSubmitted }) {
 
         try {
             const response = await fetch(
-                "http://localhost:5000/api/reports",
+                "https://civictrack-backend-byxs.onrender.com/api/reports",
                 {
                     method: "POST",
                     body: formData

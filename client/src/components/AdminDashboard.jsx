@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 
-const API_URL = "http://localhost:5000/api/reports";
+const API_URL = "https://civictrack-backend-byxs.onrender.com/api/reports";
 
 function AdminDashboard({ onReportUpdated }) {
     const [reports, setReports] = useState([]);
@@ -159,7 +159,7 @@ function AdminDashboard({ onReportUpdated }) {
 
         const evidenceURL = report.evidenceUrl.startsWith("http")
             ? report.evidenceUrl
-            : `http://localhost:5000${report.evidenceUrl}`;
+           : `https://civictrack-backend-byxs.onrender.com${report.evidenceUrl}`;
 
         const isVideo = /\.(mp4|webm)$/i.test(report.evidenceUrl);
 

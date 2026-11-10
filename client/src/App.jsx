@@ -8,7 +8,7 @@ import cityImage from "./assets/hola.jpeg";
 import Navbar from "./components/Navbar";
 import "./App.css";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://civictrack-backend-byxs.onrender.com/api/reports";
 
 function App() {
     const [reports, setReports] = useState([]);
@@ -67,7 +67,7 @@ function App() {
 
         const evidenceURL = report.evidenceUrl.startsWith("http")
             ? report.evidenceUrl
-            : `${API_URL}${report.evidenceUrl}`;
+            : `https://civictrack-backend-byxs.onrender.com${report.evidenceUrl}`;;
 
         const isVideo = /\.(mp4|webm)$/i.test(report.evidenceUrl);
 

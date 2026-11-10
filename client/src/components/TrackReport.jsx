@@ -16,7 +16,7 @@ function TrackReport() {
 
         try {
             const response = await fetch(
-                `http://localhost:5000/api/reports/${reportId}`
+                `https://civictrack-backend-byxs.onrender.com/api/reports/${reportId}`
             );
 
             const data = await response.json();
