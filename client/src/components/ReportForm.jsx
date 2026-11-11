@@ -14,7 +14,6 @@ function ReportForm({ onReportSubmitted }) {
     const [gettingLocation, setGettingLocation] = useState(false);
     const [locationMessage, setLocationMessage] = useState("");
 
-    // Capture current GPS location
     function getCurrentLocation() {
         if (!navigator.geolocation) {
             setLocationMessage("GPS is not supported by your browser.");
@@ -29,13 +28,9 @@ function ReportForm({ onReportSubmitted }) {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
 
-                // Save GPS coordinates separately
                 setLatitude(String(lat));
                 setLongitude(String(lng));
-
-                // Do NOT put GPS coordinates inside the address field
                 setLocationMessage("GPS location captured successfully!");
-
                 setGettingLocation(false);
             },
             (error) => {
@@ -126,142 +121,198 @@ function ReportForm({ onReportSubmitted }) {
         <section className="report-section" id="report">
 
             <div className="report-heading">
-                <span className="section-tag">REPORT AN ISSUE</span>
-                <h2>Make Your Voice Heard</h2>
+                <span className="section-tag">
+                    <span className="tag-dot"></span>
+                    CIVIC VOICE • COMMUNITY ACTION
+                </span>
+
+                <h2>
+                    Make Your Voice <span>Heard.</span>
+                </h2>
+
                 <p>
-                    Help improve your community by reporting civic problems around you.
+                    Every small report can make a big difference.
+                    Help us build a cleaner, safer and better city.
                 </p>
             </div>
 
-            <form className="report-form" onSubmit={handleSubmit}>
+            <div className="report-form-wrapper">
 
-                <div className="form-group">
-                    <label htmlFor="category">Select Issue Category</label>
+                <div className="form-top-bar">
+                    <div>
+                        <span className="form-step">REPORT AN ISSUE</span>
+                        <h3>Submit Your Report</h3>
+                        <p>Share the details below to help us take action.</p>
+                    </div>
 
-                    <select
-                        id="category"
-                        value={category}
-                        onChange={(event) => setCategory(event.target.value)}
-                        required
-                    >
-                        <option value="">Choose a category</option>
-                        <option value="Road Damage">Road Damage</option>
-                        <option value="Street Light">Street Light</option>
-                        <option value="Garbage">Garbage</option>
-                        <option value="Water Supply">Water Supply</option>
-                        <option value="Drainage">Drainage</option>
-                        <option value="Electricity">Electricity</option>
-                        <option value="Public Safety">Public Safety</option>
-                        <option value="Other">Other</option>
-                    </select>
+                    <div className="form-icon">✦</div>
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="description">Describe the Problem</label>
+                <form className="report-form" onSubmit={handleSubmit}>
 
-                    <textarea
-                        id="description"
-                        placeholder="Explain the civic issue in detail..."
-                        value={description}
-                        onChange={(event) => setDescription(event.target.value)}
-                        rows="5"
-                        required
-                    />
-                </div>
+                    <div className="form-group">
+                        <label htmlFor="category">
+                            Issue Category <span className="required-star">*</span>
+                        </label>
 
-                <div className="form-group">
-                    <label htmlFor="location">Issue Location</label>
+                        <select
+                            id="category"
+                            value={category}
+                            onChange={(event) => setCategory(event.target.value)}
+                            required
+                        >
+                            <option value="">Choose the type of issue</option>
+                            <option value="Road Damage">Road Damage</option>
+                            <option value="Street Light">Street Light</option>
+                            <option value="Garbage">Garbage</option>
+                            <option value="Water Supply">Water Supply</option>
+                            <option value="Drainage">Drainage</option>
+                            <option value="Electricity">Electricity</option>
+                            <option value="Public Safety">Public Safety</option>
+                            <option value="Other">Other</option>
+                        </select>
 
-                    <input
-                        id="location"
-                        type="text"
-                        placeholder="Enter area, street or landmark"
-                        value={location}
-                        onChange={(event) => setLocation(event.target.value)}
-                        required
-                    />
+                        <small>Select the category that best describes the problem.</small>
+                    </div>
 
-                    <button
-                        type="button"
-                        onClick={getCurrentLocation}
-                        disabled={gettingLocation}
-                    >
-                        {gettingLocation
-                            ? "Getting Location..."
-                            : "Use My Current Location"}
-                    </button>
+                    <div className="form-group">
+                        <label htmlFor="description">
+                            Describe the Problem <span className="required-star">*</span>
+                        </label>
 
-                    {locationMessage && (
-                        <p>{locationMessage}</p>
+                        <textarea
+                            id="description"
+                            placeholder="Tell us what happened, where it happened and how it affects the community..."
+                            value={description}
+                            onChange={(event) => setDescription(event.target.value)}
+                            rows="5"
+                            required
+                        />
+
+                        <small>Provide as much useful detail as possible.</small>
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="location">
+                            Issue Location <span className="required-star">*</span>
+                        </label>
+
+                        <input
+                            id="location"
+                            type="text"
+                            placeholder="Enter area, street, locality or landmark"
+                            value={location}
+                            onChange={(event) => setLocation(event.target.value)}
+                            required
+                        />
+
+                        <button
+                            type="button"
+                            className="location-btn"
+                            onClick={getCurrentLocation}
+                            disabled={gettingLocation}
+                        >
+                            <span className="location-icon">⌖</span>
+                            {gettingLocation
+                                ? "Getting your location..."
+                                : "Use My Current Location"}
+                        </button>
+
+                        {locationMessage && (
+                            <p className={`location-message ${
+                                latitude && longitude ? "location-success" : "location-error"
+                            }`}>
+                                {locationMessage}
+                            </p>
+                        )}
+
+                        {latitude !== "" && longitude !== "" && (
+                            <div className="gps-details">
+                                <div className="gps-heading">
+                                    <span>✓</span>
+                                    GPS Coordinates Captured
+                                </div>
+
+                                <p>Latitude: <strong>{latitude}</strong></p>
+                                <p>Longitude: <strong>{longitude}</strong></p>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="evidence">
+                            Supporting Evidence
+                            <span className="optional-label">OPTIONAL</span>
+                        </label>
+
+                        <div className="evidence-upload-box">
+                            <div className="upload-icon">↑</div>
+
+                            <div className="upload-content">
+                                <strong>Attach a photo or video</strong>
+                                <p>Choose evidence from your device to support your report.</p>
+
+                                <label htmlFor="evidence" className="upload-browse-btn">
+                                    Browse Files
+                                </label>
+                            </div>
+
+                            <input
+                                id="evidence"
+                                className="evidence-input"
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"
+                                onChange={(event) => {
+                                    const file = event.target.files[0];
+
+                                    if (file && file.size > 20 * 1024 * 1024) {
+                                        alert("File size must not exceed 20 MB.");
+                                        event.target.value = "";
+                                        setEvidence(null);
+                                        return;
+                                    }
+
+                                    setEvidence(file || null);
+                                }}
+                            />
+                        </div>
+
+                        {evidence && (
+                            <div className="selected-file">
+                                <span>✓</span>
+                                <span>Selected: {evidence.name}</span>
+                            </div>
+                        )}
+
+                        <small>
+                            JPG, PNG, WEBP, MP4 and WEBM. Maximum file size: 20 MB.
+                        </small>
+                    </div>
+
+                    <div className="form-submit-area">
+                        <button
+                            type="submit"
+                            disabled={submitting}
+                            className="submit-btn"
+                        >
+                            {submitting ? "Submitting Your Report..." : "Submit Report"}
+                            {!submitting && <span>→</span>}
+                        </button>
+
+                        <p className="form-privacy-note">
+                            Your report helps make your community better.
+                        </p>
+                    </div>
+
+                    {submitted && (
+                        <div className="success-message">
+                            <span>✓</span>
+                            Your report has been submitted successfully!
+                        </div>
                     )}
 
-                    {latitude !== "" && longitude !== "" && (
-    <div
-        style={{
-            marginTop: "12px",
-            padding: "12px",
-            backgroundColor: "#e8f5e9",
-            borderRadius: "8px",
-            color: "#1b5e20"
-        }}
-    >
-        <p><strong>GPS Location Captured Successfully!</strong></p>
-
-        <p>Latitude: {latitude}</p>
-
-        <p>Longitude: {longitude}</p>
-    </div>
-)}
-                </div>
-
-                <div className="form-group">
-                    <label htmlFor="evidence">
-                        Upload Photo or Video (Optional)
-                    </label>
-
-                    <input
-                        id="evidence"
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"
-                        onChange={(event) => {
-                            const file = event.target.files[0];
-
-                            if (file && file.size > 20 * 1024 * 1024) {
-                                alert("File size must not exceed 20 MB.");
-                                event.target.value = "";
-                                setEvidence(null);
-                                return;
-                            }
-
-                            setEvidence(file || null);
-                        }}
-                    />
-
-                    {evidence && (
-                        <p>Selected file: {evidence.name}</p>
-                    )}
-
-                    <small>
-                        Supported formats: JPG, PNG, WEBP, MP4 and WEBM.
-                        Maximum size: 20 MB.
-                    </small>
-                </div>
-
-                <button
-                    type="submit"
-                    disabled={submitting}
-                    className="submit-btn"
-                >
-                    {submitting ? "Submitting Report..." : "Submit Report"}
-                </button>
-
-                {submitted && (
-                    <p className="success-message">
-                        Your report has been submitted successfully!
-                    </p>
-                )}
-
-            </form>
+                </form>
+            </div>
         </section>
     );
 }

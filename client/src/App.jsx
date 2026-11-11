@@ -8,14 +8,20 @@ import cityImage from "./assets/hola.jpeg";
 import Navbar from "./components/Navbar";
 import "./App.css";
 
-const API_URL = "https://civictrack-backend-byxs.onrender.com/api/reports";
+import gadda from "./assets/gadda.png";
+import road from "./assets/road.png";
+import tap from "./assets/tap.png";
+import garbage from "./assets/garbage.png";
+
+const API_URL = "https://civictrack-backend-byxs.onrender.com";
 
 function App() {
+    const [selectedCategory, setSelectedCategory] = useState("");
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    // Fetch all reports from backend
+    // Fetch all reports
     useEffect(() => {
         const fetchReports = async () => {
             try {
@@ -27,11 +33,9 @@ function App() {
 
                 const data = await response.json();
                 setReports(data);
-
             } catch (err) {
                 console.error(err);
                 setError("Unable to load reports. Please try again.");
-
             } finally {
                 setLoading(false);
             }
@@ -48,7 +52,7 @@ function App() {
         ]);
     }
 
-    // Update a report everywhere in the application
+    // Update report everywhere
     function handleReportUpdated(updatedReport) {
         setReports((previousReports) =>
             previousReports.map((report) =>
@@ -67,7 +71,7 @@ function App() {
 
         const evidenceURL = report.evidenceUrl.startsWith("http")
             ? report.evidenceUrl
-            : `https://civictrack-backend-byxs.onrender.com${report.evidenceUrl}`;;
+            : `${API_URL}${report.evidenceUrl}`;
 
         const isVideo = /\.(mp4|webm)$/i.test(report.evidenceUrl);
 
@@ -129,7 +133,7 @@ function App() {
                     </div>
 
                     <div className="hero-note">
-                        <span>📍</span>
+                        <span></span>
                         Starting with Tanakpur, India
                     </div>
                 </div>
@@ -193,29 +197,41 @@ function App() {
                 </div>
 
                 <div className="category-grid">
-                    <div className="category-card">
-                        <span className="category-icon">🛣️</span>
+                    <div
+                        className={`category-card ${selectedCategory === "Road damage" ? "selected" : ""}`}
+                        onClick={() => setSelectedCategory("Road damage")}
+                    >
+                        <img src={gadda} alt="Damaged road" className="category-image" />
                         <h3>Road damage</h3>
                         <p>Potholes, broken roads and unsafe streets.</p>
                         <span className="category-arrow">↗</span>
                     </div>
 
-                    <div className="category-card">
-                        <span className="category-icon">💡</span>
+                    <div
+                        className={`category-card ${selectedCategory === "Streetlights" ? "selected" : ""}`}
+                        onClick={() => setSelectedCategory("Streetlights")}
+                    >
+                        <img src={road} alt="Streetlights" className="category-image" />
                         <h3>Streetlights</h3>
                         <p>Non-working lights and dark public spaces.</p>
                         <span className="category-arrow">↗</span>
                     </div>
 
-                    <div className="category-card">
-                        <span className="category-icon">🗑️</span>
+                    <div
+                        className={`category-card ${selectedCategory === "Waste management" ? "selected" : ""}`}
+                        onClick={() => setSelectedCategory("Waste management")}
+                    >
+                        <img src={garbage} alt="Garbage accumulation" className="category-image" />
                         <h3>Waste management</h3>
                         <p>Garbage accumulation and sanitation issues.</p>
                         <span className="category-arrow">↗</span>
                     </div>
 
-                    <div className="category-card">
-                        <span className="category-icon">💧</span>
+                    <div
+                        className={`category-card ${selectedCategory === "Water supply" ? "selected" : ""}`}
+                        onClick={() => setSelectedCategory("Water supply")}
+                    >
+                        <img src={tap} alt="Water supply" className="category-image" />
                         <h3>Water supply</h3>
                         <p>Leaks, water shortages and drainage problems.</p>
                         <span className="category-arrow">↗</span>
@@ -300,10 +316,7 @@ function App() {
                 ) : (
                     <div className="reports-grid">
                         {reports.map((report) => (
-                            <div
-                                className="report-card"
-                                key={report.id}
-                            >
+                            <div className="report-card" key={report.id}>
                                 <span className="report-status">
                                     {report.status}
                                 </span>

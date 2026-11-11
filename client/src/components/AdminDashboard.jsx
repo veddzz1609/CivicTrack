@@ -202,54 +202,84 @@ function AdminDashboard({ onReportUpdated }) {
                 <p style={{ color: "red" }}>{error}</p>
             )}
 
-            <div className="admin-stats">
-                <div className="stat-card">
-                    <h3>Total Reports</h3>
-                    <h2>{totalReports}</h2>
-                </div>
+            
 
-                <div className="stat-card">
-                    <h3>Pending</h3>
-                    <h2>{pendingReports}</h2>
-                </div>
+<div className="admin-stats">
+    <div className="stat-card total">
+        <h3>Total Reports</h3>
+        <h2>{totalReports}</h2>
+    </div>
 
-                <div className="stat-card">
-                    <h3>In Progress</h3>
-                    <h2>{progressReports}</h2>
-                </div>
+    <div className="stat-card pending">
+        <h3>Pending</h3>
+        <h2>{pendingReports}</h2>
+    </div>
 
-                <div className="stat-card">
-                    <h3>Resolved</h3>
-                    <h2>{resolvedReports}</h2>
-                </div>
-            </div>
+    <div className="stat-card progress">
+        <h3>In Progress</h3>
+        <h2>{progressReports}</h2>
+    </div>
 
-            <div className="admin-controls">
-                <input
-                    type="text"
-                    placeholder="Search complaints..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
+    <div className="stat-card resolved">
+        <h3>Resolved</h3>
+        <h2>{resolvedReports}</h2>
+    </div>
+</div>
 
-                <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                    <option value="All">All Statuses</option>
-                    <option value="Pending">Pending</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Resolved">Resolved</option>
-                </select>
 
-                <select
-                    value={sortOrder}
-                    onChange={(e) => setSortOrder(e.target.value)}
-                >
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                </select>
-            </div>
+
+            
+<div className="admin-controls">
+
+    <div className="admin-search-box">
+        <span className="admin-control-icon">⌕</span>
+        <input
+            type="text"
+            placeholder="Search by complaint ID, category or location..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        {searchTerm && (
+            <button
+                type="button"
+                className="admin-clear-search"
+                onClick={() => setSearchTerm("")}
+                aria-label="Clear search"
+            >
+                ×
+            </button>
+        )}
+    </div>
+
+    <div className="admin-filter-box">
+        <span className="admin-filter-icon">◉</span>
+        <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            aria-label="Filter complaints by status"
+        >
+            <option value="All">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Resolved">Resolved</option>
+        </select>
+    </div>
+
+    <div className="admin-filter-box">
+        <span className="admin-filter-icon">↕</span>
+        <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            aria-label="Sort complaints"
+        >
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+        </select>
+    </div>
+
+</div>
+
+            
 
             <h3>Manage Complaints ({filteredReports.length})</h3>
 
