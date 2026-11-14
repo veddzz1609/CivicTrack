@@ -311,9 +311,19 @@ function AdminDashboard({ onReportUpdated }) {
                                 {new Date(report.createdAt).toLocaleString()}
                             </p>
 
-                            <p>
-                                <strong>Current Status:</strong> {report.status}
-                            </p>
+                            <div className="current-status-row">
+    <strong>Current Status:</strong>
+
+    <span className={`status-badge ${
+        report.status === "Pending"
+            ? "status-pending"
+            : report.status === "In Progress"
+            ? "status-progress"
+            : "status-resolved"
+    }`}>
+        {report.status}
+    </span>
+</div>
 
                             <label>
                                 Update Status:{" "}
