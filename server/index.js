@@ -5,11 +5,14 @@ const prisma = require("./db");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const authorityRoutes = require("./routes/authorityRoutes");
+const authenticateAuthority = require("./middleware/authMiddleware");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use("/api/authority", authorityRoutes);
 
 // ========================================
 // 1. FILE UPLOAD CONFIGURATION
@@ -144,7 +147,10 @@ app.get("/api/reports/:id", async (req, res) => {
 // 5. UPDATE REPORT STATUS
 // ========================================
 
-app.patch("/api/reports/:id/status", async (req, res) => {
+app.patch(
+    "/api/reports/:id/status",
+    authenticateAuthority,
+    async (req, res) => {
     try {
         const reportId = Number(req.params.id);
         const { status } = req.body;
