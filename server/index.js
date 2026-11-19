@@ -40,7 +40,6 @@ const storage = multer.diskStorage({
     }
 });
 
-// Allowed file types
 const allowedTypes = [
     "image/jpeg",
     "image/png",
@@ -151,60 +150,124 @@ app.patch(
     "/api/reports/:id/status",
     authenticateAuthority,
     async (req, res) => {
-    try {
-        const reportId = Number(req.params.id);
-        const { status } = req.body;
+        try {
+            const reportId = Number(req.params.id);
+            const { status } = req.body;
 
-        const allowedStatuses = [
-            "Pending",
-            "In Progress",
-            "Resolved"
-        ];
+            const allowedStatuses = [
+                "Pending",
+                "In Progress",
+                "Resolved"
+            ];
 
-        if (!Number.isInteger(reportId) || reportId <= 0) {
-            return res.status(400).json({
-                message: "Invalid report ID."
-            });
-        }
-
-        if (!allowedStatuses.includes(status)) {
-            return res.status(400).json({
-                message: "Invalid status."
-            });
-        }
-
-        const updatedReport = await prisma.report.update({
-            where: {
-                id: reportId
-            },
-
-            data: {
-                status
+            if (!Number.isInteger(reportId) || reportId <= 0) {
+                return res.status(400).json({
+                    message: "Invalid report ID."
+                });
             }
-        });
 
-        res.json({
-            message: "Report status updated successfully!",
-            report: updatedReport
-        });
+            if (!allowedStatuses.includes(status)) {
+                return res.status(400).json({
+                    message: "Invalid status."
+                });
+            }
 
-    } catch (error) {
-        console.error("Error updating report:", error);
+            const updatedReport = await prisma.report.update({
+                where: {
+                    id: reportId
+                },
+                data: {
+                    status
+                }
+            });
 
-        if (error.code === "P2025") {
-            return res.status(404).json({
-                message: "Report not found."
+            res.json({
+                message: "Report status updated successfully!",
+                report: updatedReport
+            });
+
+        } catch (error) {
+            console.error("Error updating report:", error);
+
+            if (error.code === "P2025") {
+                return res.status(404).json({
+                    message: "Report not found."
+                });
+            }
+
+            res.status(500).json({
+                message: "Could not update report status."
             });
         }
-
-        res.status(500).json({
-            message: "Could not update report status."
-        });
     }
-});
+);
 
 // ========================================
-// 6. SUBMIT A NEW REPORT WITH GPS + EVIDENCE
+// 6. DELETE A SPECIFIC REPORT
+// ========================================
+
+app.delete(
+    "/api/reports/:id",
+    authenticateAuthority,
+    async (req, res) => {
+        try {
+            const reportId = Number(req.params.id);
+
+            if (!Number.isInteger(reportId) || reportId <= 0) {
+                return res.status(400).json({
+                    message: "Invalid report ID."
+                });
+            }
+
+            const existingReport = await prisma.report.findUnique({
+                where: {
+                    id: reportId
+                }
+            });
+
+            if (!existingReport) {
+                return res.status(404).json({
+                    message: "Report not found."
+                });
+            }
+
+            // Delete the report record only
+            await prisma.report.delete({
+                where: {
+                    id: reportId
+                }
+            });
+
+            // Remove its locally stored evidence file, if present
+            if (
+                existingReport.evidenceUrl &&
+                existingReport.evidenceUrl.startsWith("/uploads/")
+            ) {
+                const filename = path.basename(existingReport.evidenceUrl);
+                const evidencePath = path.join(uploadFolder, filename);
+
+                if (fs.existsSync(evidencePath)) {
+                    fs.unlinkSync(evidencePath);
+                }
+            }
+
+            return res.json({
+                message: "Report deleted successfully.",
+                deletedReportId: reportId
+            });
+
+        } catch (error) {
+            console.error("Error deleting report:", error);
+
+            return res.status(500).json({
+                message: "Could not delete report."
+            });
+        }
+    }
+);
+
+// ========================================
+// 7. SUBMIT A NEW REPORT WITH GPS + EVIDENCE
 // ========================================
 
 app.post(
@@ -300,13 +363,11 @@ app.post(
 );
 
 // ========================================
-// 7. ERROR HANDLING
+// 8. ERROR HANDLING
 // ========================================
 
 app.use((error, req, res, next) => {
-
     if (error instanceof multer.MulterError) {
-
         if (error.code === "LIMIT_FILE_SIZE") {
             return res.status(400).json({
                 message: "File size must not exceed 20 MB."
@@ -335,7 +396,7 @@ app.use((error, req, res, next) => {
 });
 
 // ========================================
-// 8. START SERVER
+// 9. START SERVER
 // ========================================
 
 const PORT = process.env.PORT || 5000;

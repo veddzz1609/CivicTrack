@@ -1,0 +1,123 @@
+
+.authority-login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: linear-gradient(135deg, #102b43, #173f59);
+    font-family: 'DM Sans', sans-serif;
+}
+
+.authority-login-card {
+    width: 100%;
+    max-width: 440px;
+    padding: 42px;
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.authority-login-card h1 {
+    font-family: 'Manrope', sans-serif;
+    font-size: 30px;
+    font-weight: 800;
+    color: #102b43;
+}
+
+.authority-login-card h1 span {
+    color: #16a36a;
+}
+
+.authority-login-subtitle {
+    margin-top: 4px;
+    color: #16a36a;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.authority-login-card h2 {
+    margin-top: 35px;
+    color: #102b43;
+    font-size: 27px;
+}
+
+.authority-login-card > p:not(.authority-login-subtitle) {
+    margin-top: 8px;
+    margin-bottom: 28px;
+    color: #718096;
+    font-size: 14px;
+}
+
+.authority-login-card form {
+    display: flex;
+    flex-direction: column;
+}
+
+.authority-login-card label {
+    margin-bottom: 8px;
+    color: #243b53;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.authority-login-card input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 22px;
+    border: 1px solid #dce4eb;
+    border-radius: 9px;
+    outline: none;
+    font-size: 14px;
+}
+
+.authority-login-card input:focus {
+    border-color: #16a36a;
+    box-shadow: 0 0 0 3px rgba(22, 163, 106, 0.1);
+}
+
+.authority-login-card button {
+    padding: 14px;
+    border: none;
+    border-radius: 9px;
+    background: #16a36a;
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.authority-login-card button:hover {
+    background: #128454;
+}
+
+.authority-login-card button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.authority-login-error {
+    margin-bottom: 16px;
+    color: #dc2626;
+    font-size: 13px;
+}
+
+.authority-back-link {
+    display: block;
+    margin-top: 25px;
+    text-align: center;
+    color: #64748b;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.authority-back-link:hover {
+    color: #16a36a;
+}
+
+@media (max-width: 480px) {
+    .authority-login-card {
+        padding: 28px 22px;
+    }
+}

@@ -3,11 +3,10 @@ import { useEffect, useState } from "react";
 
 const API_URL = "https://civictrack-backend-byxs.onrender.com/api/reports";
 
-function AdminDashboard({ onReportUpdated }) {
+function AdminDashboard() {
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [updatingId, setUpdatingId] = useState(null);
 
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("All");
@@ -37,57 +36,6 @@ function AdminDashboard({ onReportUpdated }) {
         fetchReports();
     }, []);
 
-    async function updateStatus(id, status) {
-        try {
-            setUpdatingId(id);
-            setError("");
-
-            const response = await fetch(
-                `${API_URL}/${id}/status`,
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ status })
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error("Could not update complaint status.");
-            }
-
-            const updatedData = await response.json();
-
-            const existingReport = reports.find(
-                (report) => report.id === id
-            ) || {};
-
-            const updatedReport = {
-                ...existingReport,
-                ...updatedData,
-                id,
-                status
-            };
-
-            setReports((previousReports) =>
-                previousReports.map((report) =>
-                    report.id === id ? updatedReport : report
-                )
-            );
-
-            // Update the main App.jsx reports state too.
-            if (onReportUpdated) {
-                onReportUpdated(updatedReport);
-            }
-
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setUpdatingId(null);
-        }
-    }
-
     const filteredReports = reports
         .filter((report) => {
             const search = searchTerm.toLowerCase();
@@ -111,12 +59,15 @@ function AdminDashboard({ onReportUpdated }) {
         });
 
     const totalReports = reports.length;
+
     const pendingReports = reports.filter(
         (report) => report.status === "Pending"
     ).length;
+
     const progressReports = reports.filter(
         (report) => report.status === "In Progress"
     ).length;
+
     const resolvedReports = reports.filter(
         (report) => report.status === "Resolved"
     ).length;
@@ -138,15 +89,20 @@ function AdminDashboard({ onReportUpdated }) {
 
         return (
             <div className="gps-details">
-                <p><strong>GPS Latitude:</strong> {latitude}</p>
-                <p><strong>GPS Longitude:</strong> {longitude}</p>
+                <p>
+                    <strong>GPS Latitude:</strong> {latitude}
+                </p>
+
+                <p>
+                    <strong>GPS Longitude:</strong> {longitude}
+                </p>
 
                 <a
                     href={mapURL}
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    📍 View Location on Google Maps
+                    View Location on Google Maps
                 </a>
             </div>
         );
@@ -159,7 +115,7 @@ function AdminDashboard({ onReportUpdated }) {
 
         const evidenceURL = report.evidenceUrl.startsWith("http")
             ? report.evidenceUrl
-           : `https://civictrack-backend-byxs.onrender.com${report.evidenceUrl}`;
+            : `https://civictrack-backend-byxs.onrender.com${report.evidenceUrl}`;
 
         const isVideo = /\.(mp4|webm)$/i.test(report.evidenceUrl);
 
@@ -195,6 +151,7 @@ function AdminDashboard({ onReportUpdated }) {
 
     return (
         <section className="admin-dashboard">
+
             <h2>Admin Dashboard</h2>
             <p>Manage and monitor citizen complaints.</p>
 
@@ -202,84 +159,83 @@ function AdminDashboard({ onReportUpdated }) {
                 <p style={{ color: "red" }}>{error}</p>
             )}
 
-            
+            <div className="admin-stats">
 
-<div className="admin-stats">
-    <div className="stat-card total">
-        <h3>Total Reports</h3>
-        <h2>{totalReports}</h2>
-    </div>
+                <div className="stat-card total">
+                    <h3>Total Reports</h3>
+                    <h2>{totalReports}</h2>
+                </div>
 
-    <div className="stat-card pending">
-        <h3>Pending</h3>
-        <h2>{pendingReports}</h2>
-    </div>
+                <div className="stat-card pending">
+                    <h3>Pending</h3>
+                    <h2>{pendingReports}</h2>
+                </div>
 
-    <div className="stat-card progress">
-        <h3>In Progress</h3>
-        <h2>{progressReports}</h2>
-    </div>
+                <div className="stat-card progress">
+                    <h3>In Progress</h3>
+                    <h2>{progressReports}</h2>
+                </div>
 
-    <div className="stat-card resolved">
-        <h3>Resolved</h3>
-        <h2>{resolvedReports}</h2>
-    </div>
-</div>
+                <div className="stat-card resolved">
+                    <h3>Resolved</h3>
+                    <h2>{resolvedReports}</h2>
+                </div>
 
+            </div>
 
+            <div className="admin-controls">
 
-            
-<div className="admin-controls">
+                <div className="admin-search-box">
+                    <span className="admin-control-icon">⌕</span>
 
-    <div className="admin-search-box">
-        <span className="admin-control-icon">⌕</span>
-        <input
-            type="text"
-            placeholder="Search by complaint ID, category or location..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        {searchTerm && (
-            <button
-                type="button"
-                className="admin-clear-search"
-                onClick={() => setSearchTerm("")}
-                aria-label="Clear search"
-            >
-                ×
-            </button>
-        )}
-    </div>
+                    <input
+                        type="text"
+                        placeholder="Search by complaint ID, category or location..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
 
-    <div className="admin-filter-box">
-        <span className="admin-filter-icon">◉</span>
-        <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            aria-label="Filter complaints by status"
-        >
-            <option value="All">All Statuses</option>
-            <option value="Pending">Pending</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Resolved">Resolved</option>
-        </select>
-    </div>
+                    {searchTerm && (
+                        <button
+                            type="button"
+                            className="admin-clear-search"
+                            onClick={() => setSearchTerm("")}
+                            aria-label="Clear search"
+                        >
+                            ×
+                        </button>
+                    )}
+                </div>
 
-    <div className="admin-filter-box">
-        <span className="admin-filter-icon">↕</span>
-        <select
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-            aria-label="Sort complaints"
-        >
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-        </select>
-    </div>
+                <div className="admin-filter-box">
+                    <span className="admin-filter-icon">◉</span>
 
-</div>
+                    <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        aria-label="Filter complaints by status"
+                    >
+                        <option value="All">All Statuses</option>
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Resolved">Resolved</option>
+                    </select>
+                </div>
 
-            
+                <div className="admin-filter-box">
+                    <span className="admin-filter-icon">↕</span>
+
+                    <select
+                        value={sortOrder}
+                        onChange={(e) => setSortOrder(e.target.value)}
+                        aria-label="Sort complaints"
+                    >
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                    </select>
+                </div>
+
+            </div>
 
             <h3>Manage Complaints ({filteredReports.length})</h3>
 
@@ -287,8 +243,12 @@ function AdminDashboard({ onReportUpdated }) {
                 <p>No complaints found.</p>
             ) : (
                 <div className="admin-report-list">
+
                     {filteredReports.map((report) => (
-                        <div className="admin-report-card" key={report.id}>
+                        <div
+                            className="admin-report-card"
+                            key={report.id}
+                        >
                             <h3>Report #{report.id}</h3>
 
                             <p>
@@ -304,6 +264,7 @@ function AdminDashboard({ onReportUpdated }) {
                             </p>
 
                             {renderGPS(report)}
+
                             {renderEvidence(report)}
 
                             <p>
@@ -312,41 +273,27 @@ function AdminDashboard({ onReportUpdated }) {
                             </p>
 
                             <div className="current-status-row">
-    <strong>Current Status:</strong>
+                                <strong>Current Status:</strong>
 
-    <span className={`status-badge ${
-        report.status === "Pending"
-            ? "status-pending"
-            : report.status === "In Progress"
-            ? "status-progress"
-            : "status-resolved"
-    }`}>
-        {report.status}
-    </span>
-</div>
-
-                            <label>
-                                Update Status:{" "}
-                                <select
-                                    value={report.status}
-                                    disabled={updatingId === report.id}
-                                    onChange={(e) =>
-                                        updateStatus(report.id, e.target.value)
-                                    }
+                                <span
+                                    className={`status-badge ${
+                                        report.status === "Pending"
+                                            ? "status-pending"
+                                            : report.status === "In Progress"
+                                            ? "status-progress"
+                                            : "status-resolved"
+                                    }`}
                                 >
-                                    <option value="Pending">Pending</option>
-                                    <option value="In Progress">In Progress</option>
-                                    <option value="Resolved">Resolved</option>
-                                </select>
-                            </label>
+                                    {report.status}
+                                </span>
+                            </div>
 
-                            {updatingId === report.id && (
-                                <p>Updating status...</p>
-                            )}
                         </div>
                     ))}
+
                 </div>
             )}
+
         </section>
     );
 }

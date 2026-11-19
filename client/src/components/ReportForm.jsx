@@ -169,7 +169,8 @@ function ReportForm({ onReportSubmitted }) {
                             <option value="Drainage">Drainage</option>
                             <option value="Electricity">Electricity</option>
                             <option value="Public Safety">Public Safety</option>
-                            <option value="Other">Other</option>
+                            <option value="Hygiene">Hygiene</option>
+                            <option value="Others">Others</option>
                         </select>
 
                         <small>Select the category that best describes the problem.</small>
