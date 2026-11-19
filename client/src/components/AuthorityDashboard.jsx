@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AuthorityDashboard.css";
 
-const API_URL = "https://civictrack-backend-byxs.onrender.com";
+const API_URL = "http://localhost:5000";
 
 function AuthorityDashboard() {
     const navigate = useNavigate();
@@ -38,18 +38,22 @@ function AuthorityDashboard() {
         }
     }
 
-    // Fetch all complaints
+    // Fetch department-specific complaints
     async function fetchReports() {
         setError("");
+        setLoading(true);
 
         try {
-            const response = await fetch(`${API_URL}/api/reports`, {
-                method: "GET",
-                headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${token}`
+            const response = await fetch(
+                `${API_URL}/api/authority/reports`,
+                {
+                    method: "GET",
+                    headers: {
+                        Accept: "application/json",
+                        Authorization: `Bearer ${token}`
+                    }
                 }
-            });
+            );
 
             const data = await readResponse(response);
 
@@ -272,7 +276,7 @@ function AuthorityDashboard() {
                         </p>
                     ) : reports.length === 0 ? (
                         <p className="authority-message">
-                            No complaints found.
+                            No complaints found for your department.
                         </p>
                     ) : (
 

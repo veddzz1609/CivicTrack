@@ -10,6 +10,39 @@ const authenticateAuthority = require("./middleware/authMiddleware");
 
 const app = express();
 
+// ========================================
+// DEPARTMENT MAPPING
+// ========================================
+
+const categoryDepartmentMap = {
+    "road damage": "road maintenance",
+    "street light": "electricity",
+    "electricity": "electricity",
+    "water supply": "water supply",
+    "garbage": "sanitation",
+    "drainage": "sanitation",
+    "hygiene": "sanitation",
+    "public safety": "public safety",
+    "others": "general administration"
+};
+
+function normalizeDepartment(department) {
+    return department
+        .trim()
+        .toLowerCase()
+        .replace(/\s+department$/, "");
+}
+
+function officerCanAccessReport(report, officerDepartment) {
+    const category = report.category.trim().toLowerCase();
+    const reportDepartment = categoryDepartmentMap[category];
+
+    return (
+        reportDepartment === normalizeDepartment(officerDepartment)
+    );
+}
+
+
 app.use(cors());
 app.use(express.json());
 app.use("/api/authority", authorityRoutes);
@@ -146,6 +179,11 @@ app.get("/api/reports/:id", async (req, res) => {
 // 5. UPDATE REPORT STATUS
 // ========================================
 
+
+// ========================================
+// 5. UPDATE REPORT STATUS
+// ========================================
+
 app.patch(
     "/api/reports/:id/status",
     authenticateAuthority,
@@ -172,6 +210,32 @@ app.patch(
                 });
             }
 
+            // Find the complaint first
+            const existingReport = await prisma.report.findUnique({
+                where: {
+                    id: reportId
+                }
+            });
+
+            if (!existingReport) {
+                return res.status(404).json({
+                    message: "Report not found."
+                });
+            }
+
+            // Verify that the complaint belongs to this officer's department
+            if (
+                !officerCanAccessReport(
+                    existingReport,
+                    req.authorityDepartment
+                )
+            ) {
+                return res.status(403).json({
+                    message: "Access denied. This complaint belongs to another department."
+                });
+            }
+
+            // Update the complaint status
             const updatedReport = await prisma.report.update({
                 where: {
                     id: reportId
@@ -181,7 +245,7 @@ app.patch(
                 }
             });
 
-            res.json({
+            return res.json({
                 message: "Report status updated successfully!",
                 report: updatedReport
             });
@@ -189,18 +253,17 @@ app.patch(
         } catch (error) {
             console.error("Error updating report:", error);
 
-            if (error.code === "P2025") {
-                return res.status(404).json({
-                    message: "Report not found."
-                });
-            }
-
             res.status(500).json({
                 message: "Could not update report status."
             });
         }
     }
 );
+
+// ========================================
+// 6. DELETE A SPECIFIC REPORT
+// ========================================
+
 
 // ========================================
 // 6. DELETE A SPECIFIC REPORT
@@ -231,20 +294,38 @@ app.delete(
                 });
             }
 
-            // Delete the report record only
+            // Verify the officer's department
+            if (
+                !officerCanAccessReport(
+                    existingReport,
+                    req.authorityDepartment
+                )
+            ) {
+                return res.status(403).json({
+                    message: "Access denied. You cannot delete another department's complaint."
+                });
+            }
+
+            // Delete the report
             await prisma.report.delete({
                 where: {
                     id: reportId
                 }
             });
 
-            // Remove its locally stored evidence file, if present
+            // Delete locally stored evidence, if available
             if (
                 existingReport.evidenceUrl &&
                 existingReport.evidenceUrl.startsWith("/uploads/")
             ) {
-                const filename = path.basename(existingReport.evidenceUrl);
-                const evidencePath = path.join(uploadFolder, filename);
+                const filename = path.basename(
+                    existingReport.evidenceUrl
+                );
+
+                const evidencePath = path.join(
+                    uploadFolder,
+                    filename
+                );
 
                 if (fs.existsSync(evidencePath)) {
                     fs.unlinkSync(evidencePath);
@@ -265,6 +346,7 @@ app.delete(
         }
     }
 );
+
 
 // ========================================
 // 7. SUBMIT A NEW REPORT WITH GPS + EVIDENCE

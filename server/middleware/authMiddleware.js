@@ -17,14 +17,16 @@ function authenticateAuthority(req, res, next) {
         // Verify the JWT token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        // Check that this token belongs to an authority account
-        if (!decoded.authorityId) {
+        // Check that this token belongs to an authority
+        if (!decoded.authorityId || !decoded.department) {
             return res.status(403).json({
                 message: "Access denied. Authority account required."
             });
         }
 
+        // Store authority details in the request
         req.authorityId = decoded.authorityId;
+        req.authorityDepartment = decoded.department;
 
         next();
 

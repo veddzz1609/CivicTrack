@@ -2,7 +2,7 @@
 import "./AuthorityLogin.css";
 import { useState } from "react";
 
-const API_URL = "https://civictrack-backend-byxs.onrender.com";
+const API_URL = "http://localhost:5000";
 
 function AuthorityLogin() {
     const [email, setEmail] = useState("");
